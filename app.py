@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-
+import sqlite3
 
 # ============================================================
 # PAGE CONFIGURATION
@@ -164,14 +164,23 @@ st.markdown(
 @st.cache_data
 def load_data():
 
-    df = pd.read_csv(
-        "data/bird_observations_clean.csv"
+    connection = sqlite3.connect(
+        "database/bird_observations.db"
     )
+
+    df = pd.read_sql_query(
+        "SELECT * FROM bird_observations",
+        connection
+    )
+
+    connection.close()
+
 
     df["Date"] = pd.to_datetime(
         df["Date"],
         errors="coerce"
     )
+
 
     boolean_columns = [
         "PIF_Watchlist_Status",
@@ -201,6 +210,7 @@ def load_data():
 
             else:
                 df[col] = df[col].astype(bool)
+
 
     return df
 
@@ -2054,7 +2064,7 @@ with tab3:
     # --------------------------------------------------------
 
     st.markdown(
-        '<div class="section-title">Environmental Conditions</div>',
+        '<div class="section-title"></div>',
         unsafe_allow_html=True
     )
 
