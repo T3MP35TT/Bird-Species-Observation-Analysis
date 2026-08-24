@@ -251,7 +251,12 @@ The dashboard provides visual analysis of:
 
 # 🗄️ SQLite Database
 
-A **SQLite database** was created to store the cleaned bird observation data and serve as the data source for dashboard visualization.
+The cleaned bird observation dataset is stored in a **SQLite database** and used as the primary data source for the Streamlit dashboard.
+
+The dashboard connects to:
+
+```text
+database/bird_observations.db
 
 The database is included in:
 
