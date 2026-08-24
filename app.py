@@ -2957,7 +2957,224 @@ with tab4:
         unsafe_allow_html=True
     )
 
+    # --------------------------------------------------------
+    # OBSERVATION ACTIVITY MAP
+    # --------------------------------------------------------
 
+    st.markdown(
+        '<div class="section-title"></div>',
+        unsafe_allow_html=True
+    )
+
+    # Approximate geographic coordinates for each
+    # administrative observation unit.
+    # These represent the monitoring area, not exact
+    # individual bird observation locations.
+
+    admin_coordinates = {
+        "ANTI": {
+            "Latitude": 39.4767,
+            "Longitude": -77.7389,
+            "Location": "Antietam National Battlefield"
+        },
+        "CATO": {
+            "Latitude": 39.6400,
+            "Longitude": -77.3300,
+            "Location": "Catoctin Mountain Park"
+        },
+        "CHOH": {
+            "Latitude": 39.1400,
+            "Longitude": -77.5000,
+            "Location": "Chesapeake & Ohio Canal National Historical Park"
+        },
+        "GWMP": {
+            "Latitude": 38.8800,
+            "Longitude": -77.0800,
+            "Location": "George Washington Memorial Parkway"
+        },
+        "HAFE": {
+            "Latitude": 39.3254,
+            "Longitude": -77.7389,
+            "Location": "Harpers Ferry National Historical Park"
+        },
+        "MANA": {
+            "Latitude": 38.7200,
+            "Longitude": -77.4750,
+            "Location": "Manassas National Battlefield Park"
+        },
+        "MONO": {
+            "Latitude": 39.4600,
+            "Longitude": -77.5100,
+            "Location": "Monocacy National Battlefield"
+        },
+        "NACE": {
+            "Latitude": 38.9000,
+            "Longitude": -77.0500,
+            "Location": "National Capital East Parks"
+        },
+        "PRWI": {
+            "Latitude": 38.6000,
+            "Longitude": -77.3500,
+            "Location": "Prince William Forest Park"
+        },
+        "ROCR": {
+            "Latitude": 38.9600,
+            "Longitude": -77.0500,
+            "Location": "Rock Creek Park"
+        },
+        "WOTR": {
+            "Latitude": 38.9500,
+            "Longitude": -77.3000,
+            "Location": "Wolf Trap National Park for the Performing Arts"
+        }
+    }
+
+
+    # Create administrative-unit summary
+    map_data = (
+        filtered_df
+        .groupby("Admin_Unit_Code")
+        .size()
+        .reset_index(name="Observations")
+    )
+
+
+    # Add geographic information
+    map_data["Latitude"] = (
+        map_data["Admin_Unit_Code"]
+        .map(
+            lambda x: admin_coordinates.get(
+                x,
+                {}
+            ).get("Latitude")
+        )
+    )
+
+    map_data["Longitude"] = (
+        map_data["Admin_Unit_Code"]
+        .map(
+            lambda x: admin_coordinates.get(
+                x,
+                {}
+            ).get("Longitude")
+        )
+    )
+
+    map_data["Location"] = (
+        map_data["Admin_Unit_Code"]
+        .map(
+            lambda x: admin_coordinates.get(
+                x,
+                {}
+            ).get("Location", x)
+        )
+    )
+
+
+    # Remove units without mapped coordinates
+    map_data = map_data.dropna(
+        subset=[
+            "Latitude",
+            "Longitude"
+        ]
+    )
+
+
+    if len(map_data) > 0:
+
+        fig = px.scatter_mapbox(
+            map_data,
+            lat="Latitude",
+            lon="Longitude",
+            size="Observations",
+            color="Observations",
+            hover_name="Location",
+            hover_data={
+                "Admin_Unit_Code": True,
+                "Observations": ":,",
+                "Latitude": False,
+                "Longitude": False
+            },
+            size_max=45,
+            zoom=7,
+            center={
+                "lat": 39.05,
+                "lon": -77.35
+            },
+            color_continuous_scale="Blues",
+            title="Observation Activity by Administrative Unit"
+        )
+
+
+        # Add administrative-unit labels
+        fig.update_traces(
+            text=map_data["Admin_Unit_Code"],
+            textposition="top center"
+        )
+
+
+        fig.update_layout(
+            height=520,
+            margin=dict(
+                l=0,
+                r=0,
+                t=60,
+                b=0
+            ),
+            mapbox_style="open-street-map",
+            coloraxis_colorbar=dict(
+                title="Observations"
+            )
+        )
+
+
+        st.plotly_chart(
+            fig,
+            use_container_width=True,
+            config={
+                "displayModeBar": False
+            }
+        )
+
+
+        # Map interpretation
+        highest_activity_unit = (
+            map_data
+            .sort_values(
+                "Observations",
+                ascending=False
+            )
+            .iloc[0]
+        )
+
+
+        st.markdown(
+            f"""
+            <div style="
+                margin-top: 8px;
+                margin-bottom: 20px;
+                padding: 12px 16px;
+                border-left: 4px solid #2563EB;
+            ">
+                <b>💡 Key Insight:</b>
+                <b>{highest_activity_unit["Location"]}</b>
+                has the highest observation activity in the current
+                selection with
+                <b>{int(highest_activity_unit["Observations"]):,}</b>
+                observations.
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    else:
+
+        st.info(
+            "No administrative units with mapped coordinates "
+            "are available for the current selection."
+        )
+
+   
     # --------------------------------------------------------
     # CONSERVATION KPIs
     # --------------------------------------------------------
