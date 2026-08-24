@@ -257,3 +257,39 @@ The database is included in:
 
 ```text
 database/bird_observations.db
+```
+# ⚠️ Data Limitations
+
+The analysis is based on **recorded bird observations**, which reflect both bird activity and survey effort.
+
+Therefore:
+
+- Higher observation counts do not necessarily represent larger bird populations.
+- Forest and Grassland contain different numbers of plots, affecting total observation volume.
+- Differences in identification methods and observation distance can influence recorded observations.
+- Environmental findings represent observed patterns and associations rather than causal relationships.
+- Survey effort should be considered when interpreting habitat-level differences.
+
+---
+
+# 🎯 Project Outcome
+
+This project transformed raw bird-monitoring records into an end-to-end analytical solution:
+
+**Raw Observation Data → Data Integration → Data Cleaning → Data Validation → Exploratory Analysis → SQLite Database → Interactive Streamlit Dashboard → Key Findings**
+
+The project demonstrates how Python-based data analysis can transform complex environmental observation records into **clear, interactive, and decision-oriented insights** for biodiversity, habitat monitoring, and conservation analysis.
+
+---
+
+## 👤 Author
+
+**Kartikey Singh**
+
+**Data Analyst | Power BI | Python | SQL | Excel**
+
+LinkedIn: *[Kartikey_Singh](https://www.linkedin.com/in/btwitskartiksinghdatanalyst/)*
+
+GitHub: *[Kartikey_Singh](https://github.com/T3MP35TT)*
+
+Portfolio : *[Kartikey_Singh]([https://github.com/T3MP35TT](https://sites.google.com/view/kartikeysingh09/home))*
