@@ -60,7 +60,24 @@ This project focuses on five key areas:
 | `.gitignore` | Files and folders excluded from version control |
 
 ---
+# 📁 Project Structure
 
+```text
+Bird-Species-Observation-Analysis/
+│
+├── .devcontainer/
+│   └── devcontainer.json
+│
+├── data/
+│   └── bird_observations_clean.csv
+│
+├── database/
+│   └── bird_observations.db
+│
+├── app.py
+├── requirements.txt
+└── .gitignore
+```
 ## 🔄 Data Analytics Workflow
 
 **Raw Data → Data Integration → Data Cleaning & Preprocessing → Data Quality Validation → Exploratory Data Analysis → Habitat Comparison → Temporal Analysis → Spatial Analysis → Species Analysis → Environmental Analysis → Observer & Visit Context → Distance & Behavior → Conservation Analysis → Key Findings → Dashboard**
