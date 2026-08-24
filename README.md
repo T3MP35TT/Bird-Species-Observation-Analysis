@@ -260,7 +260,7 @@ database/bird_observations.db
 
 The database is included in:
 
-```text
+
 database/bird_observations.db
 ```
 # ⚠️ Data Limitations
