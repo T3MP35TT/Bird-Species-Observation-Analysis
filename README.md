@@ -228,7 +228,7 @@ The dashboard provides visual analysis of:
 
 ### 🚀 Live Dashboard
 
-**[View the Streamlit Dashboard](ADD_YOUR_STREAMLIT_URL_HERE)**
+**[View the Streamlit Dashboard](https://bird-species-observation-analysis-kartikey-singh.streamlit.app/))**
 
 ---
 
