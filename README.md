@@ -73,6 +73,8 @@ Bird-Species-Observation-Analysis/
 │
 ├── database/
 │   └── bird_observations.db
+│
+├── Bird-Species-Analysis-Dashboard-Snapshot.png
 ├── BIRD SPECIES OBSERVATION ANALYSIS.pdf
 ├── app.py
 ├── requirements.txt
