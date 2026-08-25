@@ -303,6 +303,6 @@ LinkedIn: *[Kartikey_Singh](https://www.linkedin.com/in/btwitskartiksinghdatanal
 
 GitHub: *[Kartikey_Singh](https://github.com/T3MP35TT)*
 
-Portfolio : *[Kartikey_Singh]([https://github.com/T3MP35TT](https://sites.google.com/view/kartikeysingh09/home))*
+Portfolio : *[Kartikey_Singh](https://sites.google.com/view/kartikeysingh09/home)*
 
 Complete WriteUp: *[Kartikey_Singh](https://medium.com/@kartikey.singh09/i-thought-i-was-analyzing-bird-data-i-ended-up-learning-a-lot-about-data-storytelling-7ad160e12a0c?postPublishedType=initial)*
