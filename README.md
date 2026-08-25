@@ -245,9 +245,13 @@ The dashboard provides visual analysis of:
 - Flyover observations
 - Conservation indicators
 
+### Dashboard Preview
+
+![Bird Species Observation Analysis Dashboard](Bird-Species-Analysis-Dashboard-Snapshot.png)
+
 ### 🚀 Live Dashboard
 
-**[View the Streamlit Dashboard](https://bird-species-observation-analysis-kartikey-singh.streamlit.app/))**
+**[View the Streamlit Dashboard](https://bird-species-observation-analysis-kartikey-singh.streamlit.app/)**
 
 ---
 
