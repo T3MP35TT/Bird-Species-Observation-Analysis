@@ -3029,8 +3029,10 @@ with tab4:
         }
     }
 
+    # --------------------------------------------------------
+    # CREATE ADMINISTRATIVE-UNIT SUMMARY
+    # --------------------------------------------------------
 
-    # Create administrative-unit summary
     map_data = (
         filtered_df
         .groupby("Admin_Unit_Code")
@@ -3038,8 +3040,10 @@ with tab4:
         .reset_index(name="Observations")
     )
 
+    # --------------------------------------------------------
+    # ADD GEOGRAPHIC INFORMATION
+    # --------------------------------------------------------
 
-    # Add geographic information
     map_data["Latitude"] = (
         map_data["Admin_Unit_Code"]
         .map(
@@ -3070,8 +3074,10 @@ with tab4:
         )
     )
 
+    # --------------------------------------------------------
+    # REMOVE UNITS WITHOUT MAPPED COORDINATES
+    # --------------------------------------------------------
 
-    # Remove units without mapped coordinates
     map_data = map_data.dropna(
         subset=[
             "Latitude",
@@ -3079,10 +3085,13 @@ with tab4:
         ]
     )
 
+    # --------------------------------------------------------
+    # INTERACTIVE OBSERVATION ACTIVITY MAP
+    # --------------------------------------------------------
 
     if len(map_data) > 0:
 
-        fig = px.scatter_mapbox(
+        fig = px.scatter_map(
             map_data,
             lat="Latitude",
             lon="Longitude",
@@ -3105,13 +3114,18 @@ with tab4:
             title="Observation Activity by Administrative Unit"
         )
 
+        # ----------------------------------------------------
+        # ADMINISTRATIVE-UNIT LABELS
+        # ----------------------------------------------------
 
-        # Add administrative-unit labels
         fig.update_traces(
             text=map_data["Admin_Unit_Code"],
             textposition="top center"
         )
 
+        # ----------------------------------------------------
+        # MAP LAYOUT
+        # ----------------------------------------------------
 
         fig.update_layout(
             height=520,
@@ -3121,23 +3135,29 @@ with tab4:
                 t=60,
                 b=0
             ),
-            mapbox_style="open-street-map",
+            map_style="open-street-map",
             coloraxis_colorbar=dict(
                 title="Observations"
             )
         )
 
+        # ----------------------------------------------------
+        # DISPLAY MAP
+        # ----------------------------------------------------
 
         st.plotly_chart(
             fig,
             use_container_width=True,
             config={
-                "displayModeBar": False
+                "displayModeBar": True,
+                "scrollZoom": True
             }
         )
 
+        # ----------------------------------------------------
+        # MAP INTERPRETATION
+        # ----------------------------------------------------
 
-        # Map interpretation
         highest_activity_unit = (
             map_data
             .sort_values(
@@ -3146,7 +3166,6 @@ with tab4:
             )
             .iloc[0]
         )
-
 
         st.markdown(
             f"""
@@ -3174,7 +3193,6 @@ with tab4:
             "are available for the current selection."
         )
 
-   
     # --------------------------------------------------------
     # CONSERVATION KPIs
     # --------------------------------------------------------
@@ -3195,6 +3213,19 @@ with tab4:
         ]
     )
 
+    total_observations = len(filtered_df)
+
+    conservation_count = len(
+        filtered_df[
+            (
+                filtered_df["PIF_Watchlist_Status"] == True
+            )
+            |
+            (
+                filtered_df["Regional_Stewardship_Status"] == True
+            )
+        ]
+    )
 
     c1, c2, c3 = st.columns(3)
 
@@ -3208,13 +3239,21 @@ with tab4:
         f"{stewardship_count:,}"
     )
 
+    if total_observations > 0:
+        conservation_percentage = (
+            conservation_count
+            / total_observations
+            * 100
+        )
+    else:
+        conservation_percentage = 0
+
     c3.metric(
         "Conservation %",
-        f"{(conservation_count / total_observations * 100):.1f}%"
+        f"{conservation_percentage:.1f}%"
     )
 
-
-       # --------------------------------------------------------
+    # --------------------------------------------------------
     # CONSERVATION STATUS
     # --------------------------------------------------------
 
@@ -3238,7 +3277,6 @@ with tab4:
         )
     )
 
-
     # --------------------------------------------------------
     # HORIZONTAL COMPARISON CHART
     # --------------------------------------------------------
@@ -3250,28 +3288,23 @@ with tab4:
         orientation="h",
         text="Observations",
         color="Status",
-
         color_discrete_map={
             "PIF Watchlist": "#EF4444",
             "Regional Stewardship": "#2563EB"
         },
-
         title="Conservation-Status Observations"
     )
-
 
     fig.update_traces(
         texttemplate="%{x:,}",
         textposition="outside",
         marker_line_width=0,
-
         hovertemplate=(
             "<b>%{y}</b><br>"
             "Observations: %{x:,}"
             "<extra></extra>"
         )
     )
-
 
     fig = style_chart(
         fig,
@@ -3281,7 +3314,6 @@ with tab4:
         y_title=None
     )
 
-
     fig.update_layout(
         margin=dict(
             l=20,
@@ -3289,22 +3321,18 @@ with tab4:
             t=60,
             b=45
         ),
-
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
-
         xaxis=dict(
             showgrid=True,
             gridcolor="rgba(100,116,139,0.10)",
             rangemode="tozero",
             tickformat=","
         ),
-
         yaxis=dict(
             showgrid=False
         )
     )
-
 
     # --------------------------------------------------------
     # DISPLAY
@@ -3317,7 +3345,6 @@ with tab4:
             "displayModeBar": False
         }
     )
-
 
     # --------------------------------------------------------
     # KEY TREND
@@ -3357,16 +3384,12 @@ with tab4:
         )
 
         if lower_value > 0:
-
             ratio = (
                 top_value /
                 lower_value
             )
-
         else:
-
             ratio = 0
-
 
         st.markdown(
             f"""
@@ -3391,7 +3414,8 @@ with tab4:
             """,
             unsafe_allow_html=True
         )
-        # --------------------------------------------------------
+
+    # --------------------------------------------------------
     # CONSERVATION SPECIES BY HABITAT
     # --------------------------------------------------------
 
@@ -3404,7 +3428,6 @@ with tab4:
             filtered_df["Regional_Stewardship_Status"] == True
         )
     ]
-
 
     if len(conservation_df) > 0:
 
@@ -3426,7 +3449,6 @@ with tab4:
             .head(15)
         )
 
-
         # ----------------------------------------------------
         # SPECIES + HABITAT COUNTS
         # ----------------------------------------------------
@@ -3445,7 +3467,6 @@ with tab4:
             )
         )
 
-
         # Keep only Top 15
         conservation_species = (
             conservation_species[
@@ -3454,7 +3475,6 @@ with tab4:
                 )
             ]
         )
-
 
         # ----------------------------------------------------
         # ORDER SPECIES BY TOTAL OBSERVATIONS
@@ -3469,13 +3489,11 @@ with tab4:
             .tolist()
         )
 
-
         conservation_species["Common_Name"] = pd.Categorical(
             conservation_species["Common_Name"],
             categories=species_order,
             ordered=True
         )
-
 
         # ----------------------------------------------------
         # HABITAT COLORS
@@ -3485,7 +3503,6 @@ with tab4:
             "Forest": "#2563EB",
             "Grassland": "#16A34A"
         }
-
 
         # ----------------------------------------------------
         # STACKED HORIZONTAL BAR
@@ -3512,7 +3529,6 @@ with tab4:
             ]
         )
 
-
         # ----------------------------------------------------
         # BAR STYLING
         # ----------------------------------------------------
@@ -3527,22 +3543,18 @@ with tab4:
             )
         )
 
-
         # ----------------------------------------------------
         # CHART LAYOUT
         # ----------------------------------------------------
 
         fig.update_layout(
-
             height=540,
-
             margin=dict(
                 l=10,
                 r=35,
                 t=90,
                 b=45
             ),
-
             title=dict(
                 text="Top Conservation-Status Species by Habitat",
                 x=0,
@@ -3553,7 +3565,6 @@ with tab4:
                     size=18
                 )
             ),
-
             legend=dict(
                 title=None,
                 orientation="h",
@@ -3562,27 +3573,22 @@ with tab4:
                 xanchor="right",
                 x=1
             ),
-
             xaxis=dict(
                 title="Total Observations",
                 showgrid=True,
                 gridcolor="rgba(128,128,128,0.18)",
                 zeroline=False
             ),
-
             yaxis=dict(
                 title=None,
                 showgrid=False,
                 categoryorder="array",
                 categoryarray=species_order
             ),
-
             bargap=0.28,
-
             plot_bgcolor="rgba(0,0,0,0)",
             paper_bgcolor="rgba(0,0,0,0)"
         )
-
 
         # ----------------------------------------------------
         # TOTAL LABELS
@@ -3596,7 +3602,6 @@ with tab4:
                 ascending=True
             )
         )
-
 
         for _, row in totals_for_labels.iterrows():
 
@@ -3612,7 +3617,6 @@ with tab4:
                 )
             )
 
-
         # ----------------------------------------------------
         # DISPLAY
         # ----------------------------------------------------
@@ -3624,7 +3628,6 @@ with tab4:
                 "displayModeBar": False
             }
         )
-
 
         # ----------------------------------------------------
         # KEY TREND - CONSERVATION SPECIES
@@ -3709,7 +3712,6 @@ with tab4:
                 unsafe_allow_html=True
             )
 
-
     # --------------------------------------------------------
     # PLOT ACTIVITY
     # --------------------------------------------------------
@@ -3737,9 +3739,7 @@ with tab4:
         )
     )
 
-
     col1, col2 = st.columns(2)
-
 
     # --------------------------------------------------------
     # TOP 15 MOST ACTIVE PLOTS — EACH HABITAT
@@ -3747,7 +3747,6 @@ with tab4:
 
     with col1:
 
-        # Top 15 Forest plots
         forest_plots = (
             plot_activity[
                 plot_activity["Habitat"] == "Forest"
@@ -3759,8 +3758,6 @@ with tab4:
             .head(15)
         )
 
-
-        # Top 15 Grassland plots
         grassland_plots = (
             plot_activity[
                 plot_activity["Habitat"] == "Grassland"
@@ -3772,8 +3769,6 @@ with tab4:
             .head(15)
         )
 
-
-        # Combine both rankings
         top_plots = pd.concat(
             [
                 forest_plots,
@@ -3782,8 +3777,6 @@ with tab4:
             ignore_index=True
         )
 
-
-        # Sort so highest activity appears at the top
         top_plots = (
             top_plots
             .sort_values(
@@ -3791,11 +3784,6 @@ with tab4:
                 ascending=True
             )
         )
-
-
-        # ----------------------------------------------------
-        # SECTION TITLE
-        # ----------------------------------------------------
 
         st.markdown(
             """
@@ -3809,11 +3797,6 @@ with tab4:
             """,
             unsafe_allow_html=True
         )
-
-
-        # ----------------------------------------------------
-        # BAR CHART
-        # ----------------------------------------------------
 
         fig = px.bar(
             top_plots,
@@ -3834,11 +3817,6 @@ with tab4:
             }
         )
 
-
-        # ----------------------------------------------------
-        # BAR FORMATTING
-        # ----------------------------------------------------
-
         fig.update_traces(
             textposition="outside",
             textfont=dict(
@@ -3853,23 +3831,15 @@ with tab4:
             )
         )
 
-
-        # ----------------------------------------------------
-        # CHART LAYOUT
-        # ----------------------------------------------------
-
         fig.update_layout(
             height=700,
-
             margin=dict(
                 l=10,
                 r=45,
                 t=25,
                 b=50
             ),
-
             title=None,
-
             legend=dict(
                 title=None,
                 orientation="h",
@@ -3878,29 +3848,20 @@ with tab4:
                 xanchor="right",
                 x=1
             ),
-
             xaxis=dict(
                 title="Observations",
                 showgrid=True,
                 gridcolor="rgba(128,128,128,0.18)",
                 zeroline=False
             ),
-
             yaxis=dict(
                 title=None,
                 showgrid=False
             ),
-
             bargap=0.22,
-
             plot_bgcolor="rgba(0,0,0,0)",
             paper_bgcolor="rgba(0,0,0,0)"
         )
-
-
-        # ----------------------------------------------------
-        # DISPLAY
-        # ----------------------------------------------------
 
         st.plotly_chart(
             fig,
@@ -3909,7 +3870,6 @@ with tab4:
                 "displayModeBar": False
             }
         )
-
 
         # ----------------------------------------------------
         # KEY TREND - MOST ACTIVE PLOTS
@@ -3992,7 +3952,6 @@ with tab4:
                 unsafe_allow_html=True
             )
 
-
     # --------------------------------------------------------
     # PLOT SUMMARY
     # --------------------------------------------------------
@@ -4013,57 +3972,53 @@ with tab4:
             .reset_index()
         )
 
-
         plot_summary[
             "Mean_Observations"
         ] = plot_summary[
             "Mean_Observations"
         ].round(2)
 
-
         plot_summary[
             "Median_Observations"
         ] = plot_summary[
             "Median_Observations"
         ].round(2)
-
 
         st.markdown(
             "### Plot Performance"
         )
 
-
         st.dataframe(
-    plot_summary,
-    use_container_width=True,
-    hide_index=True,
-    column_config={
+            plot_summary,
+            use_container_width=True,
+            hide_index=True,
+            column_config={
 
-        "Habitat": st.column_config.TextColumn(
-            "Habitat"
-        ),
+                "Habitat": st.column_config.TextColumn(
+                    "Habitat"
+                ),
 
-        "Number_of_Plots": st.column_config.NumberColumn(
-            "Number of Plots",
-            format="%d"
-        ),
+                "Number_of_Plots": st.column_config.NumberColumn(
+                    "Number of Plots",
+                    format="%d"
+                ),
 
-        "Mean_Observations": st.column_config.NumberColumn(
-            "Mean Observations",
-            format="%.2f"
-        ),
+                "Mean_Observations": st.column_config.NumberColumn(
+                    "Mean Observations",
+                    format="%.2f"
+                ),
 
-        "Median_Observations": st.column_config.NumberColumn(
-            "Median Observations",
-            format="%.0f"
-        ),
+                "Median_Observations": st.column_config.NumberColumn(
+                    "Median Observations",
+                    format="%.0f"
+                ),
 
-        "Maximum_Observations": st.column_config.NumberColumn(
-            "Maximum Observations",
-            format="%d"
+                "Maximum_Observations": st.column_config.NumberColumn(
+                    "Maximum Observations",
+                    format="%d"
+                )
+            }
         )
-    }
-)
 
         # ----------------------------------------------------
         # KEY TREND - PLOT PERFORMANCE
@@ -4131,7 +4086,6 @@ with tab4:
                 unsafe_allow_html=True
             )
 
-
         # ----------------------------------------------------
         # HIGHEST ACTIVITY PLOT
         # ----------------------------------------------------
@@ -4147,28 +4101,23 @@ with tab4:
                 .iloc[0]
             )
 
-
             st.markdown(
                 "### Highest Activity Plot"
             )
-
 
             st.metric(
                 "Plot",
                 top_plot["Plot_Name"]
             )
 
-
             st.metric(
                 "Observations",
                 f"{int(top_plot['Observations']):,}"
             )
 
-
             st.caption(
                 f"Habitat: {top_plot['Habitat']}"
             )
-
 
             # ------------------------------------------------
             # KEY TREND - HIGHEST ACTIVITY PLOT
@@ -4212,15 +4161,13 @@ with tab4:
                 unsafe_allow_html=True
             )
 
-
     # --------------------------------------------------------
-    # PLOT DETAIL
+    # PLOT ACTIVITY DETAIL
     # --------------------------------------------------------
 
     st.markdown(
         "### Plot Activity Detail"
     )
-
 
     st.dataframe(
         plot_activity,
@@ -4228,7 +4175,6 @@ with tab4:
         hide_index=True,
         height=350
     )
-
 
     # --------------------------------------------------------
     # KEY TREND - PLOT ACTIVITY DETAIL
@@ -4277,7 +4223,6 @@ with tab4:
             unsafe_allow_html=True
         )
 
-
     # --------------------------------------------------------
     # FILTERED OBSERVATION DATA
     # --------------------------------------------------------
@@ -4286,11 +4231,9 @@ with tab4:
         "### Filtered Observation Data"
     )
 
-
     st.caption(
         "Select a row to inspect the complete observation details."
     )
-
 
     display_columns = [
         "Date",
@@ -4307,13 +4250,11 @@ with tab4:
         "Regional_Stewardship_Status"
     ]
 
-
     display_columns = [
         col
         for col in display_columns
         if col in filtered_df.columns
     ]
-
 
     filtered_table = (
         filtered_df[
@@ -4326,13 +4267,11 @@ with tab4:
         .reset_index(drop=True)
     )
 
-
     # --------------------------------------------------------
     # KEEP ORIGINAL STATUS VALUES FOR SELECTION
     # --------------------------------------------------------
 
     table_display = filtered_table.copy()
-
 
     # --------------------------------------------------------
     # VISUAL STATUS DOTS
@@ -4348,7 +4287,6 @@ with tab4:
         })
     )
 
-
     table_display["Regional_Stewardship_Status"] = (
         table_display[
             "Regional_Stewardship_Status"
@@ -4359,24 +4297,17 @@ with tab4:
         })
     )
 
-
     # --------------------------------------------------------
     # INTERACTIVE TABLE
     # --------------------------------------------------------
 
     selected_rows = st.dataframe(
         table_display,
-
         use_container_width=True,
-
         hide_index=True,
-
         height=420,
-
         on_select="rerun",
-
         selection_mode="single-row",
-
         column_config={
 
             "Date": st.column_config.DatetimeColumn(
@@ -4447,7 +4378,6 @@ with tab4:
         }
     )
 
-
     # --------------------------------------------------------
     # KEY TREND - FILTERED OBSERVATION DATA
     # --------------------------------------------------------
@@ -4455,7 +4385,6 @@ with tab4:
     if len(filtered_table) > 0:
 
         filtered_total = len(filtered_table)
-
 
         # ----------------------------------------------------
         # DOMINANT HABITAT
@@ -4480,7 +4409,6 @@ with tab4:
             * 100
         )
 
-
         # ----------------------------------------------------
         # MOST OBSERVED SPECIES
         # ----------------------------------------------------
@@ -4498,7 +4426,6 @@ with tab4:
             species_counts_filtered.iloc[0]
         )
 
-
         # ----------------------------------------------------
         # MOST COMMON ID METHOD
         # ----------------------------------------------------
@@ -4515,7 +4442,6 @@ with tab4:
         dominant_id_count = int(
             id_counts_filtered.iloc[0]
         )
-
 
         st.markdown(
             f"""
@@ -4544,7 +4470,6 @@ with tab4:
             unsafe_allow_html=True
         )
 
-
     # --------------------------------------------------------
     # SELECTED OBSERVATION
     # --------------------------------------------------------
@@ -4555,20 +4480,16 @@ with tab4:
             selected_rows.selection.rows[0]
         )
 
-
         selected_observation = (
             filtered_table
             .iloc[selected_index]
         )
 
-
         st.markdown(
             "#### 🔎 Selected Observation"
         )
 
-
         d1, d2, d3, d4 = st.columns(4)
-
 
         with d1:
 
@@ -4577,14 +4498,12 @@ with tab4:
                 selected_observation["Common_Name"]
             )
 
-
         with d2:
 
             st.metric(
                 "Habitat",
                 selected_observation["Habitat"]
             )
-
 
         with d3:
 
@@ -4593,7 +4512,6 @@ with tab4:
                 selected_observation["Plot_Name"]
             )
 
-
         with d4:
 
             st.metric(
@@ -4601,14 +4519,11 @@ with tab4:
                 selected_observation["ID_Method"]
             )
 
-
         st.markdown(
             "##### Observation Details"
         )
 
-
         detail_col1, detail_col2 = st.columns(2)
-
 
         with detail_col1:
 
@@ -4632,7 +4547,6 @@ with tab4:
                 f"{selected_observation['Distance']}"
             )
 
-
         with detail_col2:
 
             st.write(
@@ -4655,7 +4569,6 @@ with tab4:
                 f"{'🔴 Yes' if selected_observation['Regional_Stewardship_Status'] else '⚪ No'}"
             )
 
-
         # ----------------------------------------------------
         # DOWNLOAD
         # ----------------------------------------------------
@@ -4665,7 +4578,6 @@ with tab4:
             .to_csv(index=False)
             .encode("utf-8")
         )
-
 
         st.download_button(
             label="⬇️ Download Filtered Data",
